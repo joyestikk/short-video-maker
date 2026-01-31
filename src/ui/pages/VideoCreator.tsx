@@ -6,7 +6,6 @@ import {
   Button,
   TextField,
   Typography,
-  Paper,
   Grid,
   FormControl,
   InputLabel,
@@ -17,9 +16,17 @@ import {
   IconButton,
   Divider,
   InputAdornment,
+  Card,
+  CardContent,
+  Stack,
+  Chip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import MovieIcon from "@mui/icons-material/Movie";
+import SettingsIcon from "@mui/icons-material/Settings";
+import SearchIcon from "@mui/icons-material/Search";
+import NotesIcon from "@mui/icons-material/Notes";
 import {
   SceneInput,
   RenderConfig,
@@ -32,7 +39,7 @@ import {
 
 interface SceneFormData {
   text: string;
-  searchTerms: string; // Changed to string
+  searchTerms: string;
 }
 
 const VideoCreator: React.FC = () => {
@@ -111,7 +118,6 @@ const VideoCreator: React.FC = () => {
     setError(null);
 
     try {
-      // Convert scenes to the expected API format
       const apiScenes: SceneInput[] = scenes.map((scene) => ({
         text: scene.text,
         searchTerms: scene.searchTerms
@@ -148,234 +154,297 @@ const VideoCreator: React.FC = () => {
   }
 
   return (
-    <Box maxWidth="md" mx="auto" py={4}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Create New Video
-      </Typography>
+    <Box maxWidth="md" mx="auto">
+      <Box mb={6}>
+        <Typography variant="h3" component="h1" sx={{ fontWeight: 800, mb: 1 }}>
+          Create Video
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Craft your story scene by scene and customize the final output.
+        </Typography>
+      </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 4, borderRadius: 2 }}>
           {error}
         </Alert>
       )}
 
       <form onSubmit={handleSubmit}>
-        <Typography variant="h5" component="h2" gutterBottom>
-          Scenes
-        </Typography>
-
-        {scenes.map((scene, index) => (
-          <Paper key={index} sx={{ p: 3, mb: 3 }}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mb={2}
-            >
-              <Typography variant="h6">Scene {index + 1}</Typography>
-              {scenes.length > 1 && (
-                <IconButton
-                  onClick={() => handleRemoveScene(index)}
-                  color="error"
-                  size="small"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              )}
+        <Stack spacing={6}>
+          <Box>
+            <Box display="flex" alignItems="center" mb={3}>
+              <MovieIcon sx={{ mr: 1.5, color: 'primary.main' }} />
+              <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
+                Storyboard
+              </Typography>
             </Box>
 
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Text"
-                  multiline
-                  rows={4}
-                  value={scene.text}
-                  onChange={(e) =>
-                    handleSceneChange(index, "text", e.target.value)
-                  }
-                  required
-                />
-              </Grid>
+            {scenes.map((scene, index) => (
+              <Card key={index} sx={{ mb: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                <CardContent sx={{ p: 4 }}>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={3}
+                  >
+                    <Chip
+                      label={`Scene ${index + 1}`}
+                      color="primary"
+                      variant="outlined"
+                      sx={{ fontWeight: 700 }}
+                    />
+                    {scenes.length > 1 && (
+                      <IconButton
+                        onClick={() => handleRemoveScene(index)}
+                        color="error"
+                        size="small"
+                        sx={{ bgcolor: 'rgba(211, 47, 47, 0.05)' }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  </Box>
 
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Search Terms (comma-separated)"
-                  value={scene.searchTerms}
-                  onChange={(e) =>
-                    handleSceneChange(index, "searchTerms", e.target.value)
-                  }
-                  helperText="Enter keywords for background video, separated by commas"
-                  required
-                />
-              </Grid>
-            </Grid>
-          </Paper>
-        ))}
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Narration Text"
+                        multiline
+                        rows={3}
+                        placeholder="What should be said in this scene?"
+                        value={scene.text}
+                        onChange={(e) =>
+                          handleSceneChange(index, "text", e.target.value)
+                        }
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <NotesIcon color="action" sx={{ mr: 1 }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        required
+                      />
+                    </Grid>
 
-        <Box display="flex" justifyContent="center" mb={4}>
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={handleAddScene}
-          >
-            Add Scene
-          </Button>
-        </Box>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Visual Search Terms"
+                        placeholder="e.g. city, sunset, futuristic"
+                        value={scene.searchTerms}
+                        onChange={(e) =>
+                          handleSceneChange(index, "searchTerms", e.target.value)
+                        }
+                        helperText="Keywords to find relevant background footage (comma-separated)"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchIcon color="action" sx={{ mr: 1 }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        required
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            ))}
 
-        <Divider sx={{ mb: 4 }} />
+            <Box display="flex" justifyContent="center">
+              <Button
+                variant="outlined"
+                startIcon={<AddIcon />}
+                onClick={handleAddScene}
+                sx={{ borderStyle: 'dashed', borderWidth: 2, px: 4 }}
+              >
+                Add Another Scene
+              </Button>
+            </Box>
+          </Box>
 
-        <Typography variant="h5" component="h2" gutterBottom>
-          Video Configuration
-        </Typography>
+          <Divider />
 
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                type="number"
-                label="End Screen Padding (ms)"
-                value={config.paddingBack}
-                onChange={(e) =>
-                  handleConfigChange("paddingBack", parseInt(e.target.value))
-                }
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">ms</InputAdornment>
-                  ),
-                }}
-                helperText="Duration to keep playing after narration ends"
-                required
-              />
-            </Grid>
+          <Box>
+            <Box display="flex" alignItems="center" mb={3}>
+              <SettingsIcon sx={{ mr: 1.5, color: 'secondary.main' }} />
+              <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
+                Video Settings
+              </Typography>
+            </Box>
 
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Music Mood</InputLabel>
-                <Select
-                  value={config.music}
-                  onChange={(e) => handleConfigChange("music", e.target.value)}
-                  label="Music Mood"
-                  required
-                >
-                  {Object.values(MusicMoodEnum).map((tag) => (
-                    <MenuItem key={tag} value={tag}>
-                      {tag}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+            <Card sx={{ border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+              <CardContent sx={{ p: 4 }}>
+                <Grid container spacing={4}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label="End Padding"
+                      value={config.paddingBack}
+                      onChange={(e) =>
+                        handleConfigChange("paddingBack", parseInt(e.target.value))
+                      }
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">ms</InputAdornment>
+                        ),
+                      }}
+                      helperText="Keep playing after narration ends"
+                      required
+                    />
+                  </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Caption Position</InputLabel>
-                <Select
-                  value={config.captionPosition}
-                  onChange={(e) =>
-                    handleConfigChange("captionPosition", e.target.value)
-                  }
-                  label="Caption Position"
-                  required
-                >
-                  {Object.values(CaptionPositionEnum).map((position) => (
-                    <MenuItem key={position} value={position}>
-                      {position}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth>
+                      <InputLabel>Music Mood</InputLabel>
+                      <Select
+                        value={config.music}
+                        onChange={(e) => handleConfigChange("music", e.target.value)}
+                        label="Music Mood"
+                        required
+                      >
+                        {musicTags.map((tag) => (
+                          <MenuItem key={tag} value={tag}>
+                            {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Caption Background Color"
-                value={config.captionBackgroundColor}
-                onChange={(e) =>
-                  handleConfigChange("captionBackgroundColor", e.target.value)
-                }
-                helperText="Any valid CSS color (name, hex, rgba)"
-                required
-              />
-            </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth>
+                      <InputLabel>Caption Position</InputLabel>
+                      <Select
+                        value={config.captionPosition}
+                        onChange={(e) =>
+                          handleConfigChange("captionPosition", e.target.value)
+                        }
+                        label="Caption Position"
+                        required
+                      >
+                        {Object.values(CaptionPositionEnum).map((position) => (
+                          <MenuItem key={position} value={position}>
+                            {position.charAt(0).toUpperCase() + position.slice(1)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Default Voice</InputLabel>
-                <Select
-                  value={config.voice}
-                  onChange={(e) => handleConfigChange("voice", e.target.value)}
-                  label="Default Voice"
-                  required
-                >
-                  {Object.values(VoiceEnum).map((voice) => (
-                    <MenuItem key={voice} value={voice}>
-                      {voice}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Caption Background"
+                      value={config.captionBackgroundColor}
+                      onChange={(e) =>
+                        handleConfigChange("captionBackgroundColor", e.target.value)
+                      }
+                      helperText="CSS color (e.g. blue, #ff0000)"
+                      required
+                    />
+                  </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Orientation</InputLabel>
-                <Select
-                  value={config.orientation}
-                  onChange={(e) =>
-                    handleConfigChange("orientation", e.target.value)
-                  }
-                  label="Orientation"
-                  required
-                >
-                  {Object.values(OrientationEnum).map((orientation) => (
-                    <MenuItem key={orientation} value={orientation}>
-                      {orientation}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth>
+                      <InputLabel>Voice Artist</InputLabel>
+                      <Select
+                        value={config.voice}
+                        onChange={(e) => handleConfigChange("voice", e.target.value)}
+                        label="Voice Artist"
+                        required
+                      >
+                        {voices.map((voice) => (
+                          <MenuItem key={voice} value={voice}>
+                            {voice.replace('af_', 'Female ').replace('am_', 'Male ').replace('bf_', 'British F ').replace('bm_', 'British M ')}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Volume of the background audio</InputLabel>
-                <Select
-                  value={config.musicVolume}
-                  onChange={(e) =>
-                    handleConfigChange("musicVolume", e.target.value)
-                  }
-                  label="Volume of the background audio"
-                  required
-                >
-                  {Object.values(MusicVolumeEnum).map((voice) => (
-                    <MenuItem key={voice} value={voice}>
-                      {voice}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Paper>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth>
+                      <InputLabel>Orientation</InputLabel>
+                      <Select
+                        value={config.orientation}
+                        onChange={(e) =>
+                          handleConfigChange("orientation", e.target.value)
+                        }
+                        label="Orientation"
+                        required
+                      >
+                        {Object.values(OrientationEnum).map((orientation) => (
+                          <MenuItem key={orientation} value={orientation}>
+                            {orientation.charAt(0).toUpperCase() + orientation.slice(1)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
 
-        <Box display="flex" justifyContent="center">
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth>
+                      <InputLabel>Music Volume</InputLabel>
+                      <Select
+                        value={config.musicVolume}
+                        onChange={(e) =>
+                          handleConfigChange("musicVolume", e.target.value)
+                        }
+                        label="Music Volume"
+                        required
+                      >
+                        {Object.values(MusicVolumeEnum).map((vol) => (
+                          <MenuItem key={vol} value={vol}>
+                            {vol.charAt(0).toUpperCase() + vol.slice(1)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Box>
+        </Stack>
+
+        <Box
+          sx={{
+            mt: 8,
+            mb: 8,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
           <Button
             type="submit"
             variant="contained"
-            color="primary"
             size="large"
             disabled={loading}
-            sx={{ minWidth: 200 }}
+            sx={{
+              minWidth: 320,
+              py: 2.5,
+              borderRadius: 4,
+              fontSize: '1.2rem',
+              fontWeight: 800,
+              boxShadow: '0 8px 32px rgba(187, 134, 252, 0.4)',
+              background: 'linear-gradient(45deg, #bb86fc 30%, #9965f4 90%)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'scale(1.02)',
+                boxShadow: '0 12px 40px rgba(187, 134, 252, 0.5)',
+              }
+            }}
           >
             {loading ? (
-              <CircularProgress size={24} color="inherit" />
+              <CircularProgress size={28} color="inherit" />
             ) : (
-              "Create Video"
+              "Render Video"
             )}
           </Button>
         </Box>

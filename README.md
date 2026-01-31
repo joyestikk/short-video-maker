@@ -187,26 +187,19 @@ Windows is **NOT** supported at the moment (whisper.cpp installation fails occas
 
 # Web UI
 
-@mushitori made a Web UI to generate the videos from your browser.
+The project features a modern, dark-themed "Studio" Web UI for effortless video creation. Built with React and TypeScript, it provides a sleek interface to manage your scenes and render videos.
 
-<table>
-  <tr>
-    <td>
-      <img width="1088" alt="Screenshot 2025-05-12 at 1 45 11 PM" src="https://github.com/user-attachments/assets/2ab64aea-f639-41b0-bd19-2fcf73bb1a3d" />
-    </td>
-    <td>
-      <img width="1075" alt="Screenshot 2025-05-12 at 1 45 44 PM" src="https://github.com/user-attachments/assets/0ff568fe-ddcb-4dad-ae62-2640290aef1e" />
-    </td>
-    <td>
-      <img width="1083" alt="Screenshot 2025-05-12 at 1 45 51 PM" src="https://github.com/user-attachments/assets/d3c1c826-3cb3-4313-b17c-605ff612fb63" />
-    </td>
-    <td>
-      <img width="1070" alt="Screenshot 2025-05-12 at 1 46 42 PM" src="https://github.com/user-attachments/assets/18edb1a0-9fc2-48b3-8896-e919e7dc57ff" />
-    </td>
-  </tr>
-</table>
+- **Sleek Dark Theme:** Modern aesthetic with glassmorphism and smooth animations.
+- **Interactive Grid:** View all your projects at a glance with status indicators.
+- **Structured Creator:** Easy-to-use form with scene management and real-time previews.
 
 You can load it on http://localhost:3123
+
+# Download & Executables
+
+You can download pre-compiled executables for Windows, Linux, and macOS from the [Releases](https://github.com/gyoridavid/short-video-maker/releases) page.
+
+> **Note:** Even when using the executable, you still need to have **Google Chrome** or **Chromium** installed on your system for video rendering via Remotion.
 
 # Environment variables
 

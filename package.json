@@ -17,7 +17,20 @@
     "publish:docker:tiny": "docker buildx build --platform linux/amd64,linux/arm64 -t gyoridavid/short-video-maker:latest-tiny -t gyoridavid/short-video-maker:${npm_package_version}-tiny -f main-tiny.Dockerfile --push ./",
     "ui:dev": "vite",
     "ui:build": "vite build",
-    "ui:preview": "vite preview"
+    "ui:preview": "vite preview",
+    "package": "npm run build && pkg ."
+  },
+  "pkg": {
+    "assets": [
+      "dist/ui/**/*",
+      "static/**/*"
+    ],
+    "targets": [
+      "node20-win-x64",
+      "node20-linux-x64",
+      "node20-macos-x64"
+    ],
+    "outputPath": "executables"
   },
   "bin": {
     "short-video-maker": "dist/index.js"
@@ -89,6 +102,8 @@
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.16",
     "eslint": "^9.24.0",
+    "memfs": "^4.56.10",
+    "pkg": "^5.8.1",
     "postcss": "^8.4.31",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",

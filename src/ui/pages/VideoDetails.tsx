@@ -8,10 +8,15 @@ import {
   Button, 
   CircularProgress, 
   Alert,
-  Grid
+  Grid,
+  Card,
+  CardContent,
+  Fade,
+  LinearProgress,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DownloadIcon from '@mui/icons-material/Download';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { VideoStatus } from '../../types/shorts';
 
 const VideoDetails: React.FC = () => {
@@ -172,49 +177,82 @@ const VideoDetails: React.FC = () => {
   };
 
   return (
-    <Box maxWidth="md" mx="auto" py={4}>
-      <Box display="flex" alignItems="center" mb={3}>
+    <Box maxWidth="md" mx="auto">
+      <Box display="flex" alignItems="center" mb={6}>
         <Button 
+          variant="text"
           startIcon={<ArrowBackIcon />} 
           onClick={handleBack}
-          sx={{ mr: 2 }}
+          sx={{ mr: 2, color: 'text.secondary' }}
         >
           Back to videos
         </Button>
-        <Typography variant="h4" component="h1">
-          Video Details
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 800 }}>
+          Video Studio
         </Typography>
       </Box>
 
-      <Paper sx={{ p: 3 }}>
-        <Grid container spacing={2} mb={3}>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="body2" color="text.secondary">
-              Video ID
-            </Typography>
-            <Typography variant="body1">
-              {videoId || 'Unknown'}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="body2" color="text.secondary">
-              Status
-            </Typography>
-            <Typography 
-              variant="body1" 
-              color={
-                status === 'ready' ? 'success.main' : 
-                status === 'processing' ? 'info.main' : 
-                status === 'failed' ? 'error.main' : 'text.primary'
-              }
-            >
-              {capitalizeFirstLetter(status)}
-            </Typography>
-          </Grid>
-        </Grid>
-        
-        {renderContent()}
-      </Paper>
+      <Fade in={true} timeout={800}>
+        <Card sx={{ borderRadius: 4, overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+          <CardContent sx={{ p: 0 }}>
+            <Box sx={{ p: 4, borderBottom: '1px solid rgba(255, 255, 255, 0.05)', bgcolor: 'rgba(255, 255, 255, 0.02)' }}>
+              <Grid container spacing={4}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: 1 }}>
+                    Project ID
+                  </Typography>
+                  <Typography variant="h6" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                    {videoId || 'Unknown'}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: 1 }}>
+                    Processing Status
+                  </Typography>
+                  <Box display="flex" alignItems="center">
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: '50%',
+                        mr: 1.5,
+                        bgcolor:
+                          status === 'ready' ? 'success.main' :
+                          status === 'processing' ? 'info.main' :
+                          status === 'failed' ? 'error.main' : 'text.disabled',
+                        boxShadow:
+                          status === 'ready' ? '0 0 10px rgba(102, 187, 106, 0.5)' :
+                          status === 'processing' ? '0 0 10px rgba(41, 182, 246, 0.5)' : 'none'
+                      }}
+                    />
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        color:
+                          status === 'ready' ? 'success.light' :
+                          status === 'processing' ? 'info.light' :
+                          status === 'failed' ? 'error.light' : 'text.primary'
+                      }}
+                    >
+                      {capitalizeFirstLetter(status)}
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
+
+            <Box sx={{ p: 4 }}>
+              {status === 'processing' && (
+                <Box sx={{ width: '100%', mt: 2, mb: 4 }}>
+                  <LinearProgress color="info" sx={{ borderRadius: 5, height: 8 }} />
+                </Box>
+              )}
+              {renderContent()}
+            </Box>
+          </CardContent>
+        </Card>
+      </Fade>
     </Box>
   );
 };

@@ -8,16 +8,18 @@ import {
   Button, 
   CircularProgress, 
   Alert,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
   IconButton,
-  Divider
+  Chip,
+  Tooltip,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 
 interface VideoItem {
   id: string;
@@ -79,103 +81,170 @@ const VideoList: React.FC = () => {
     );
   }
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'ready': return 'success';
+      case 'processing': return 'info';
+      case 'failed': return 'error';
+      default: return 'default';
+    }
+  };
+
   return (
-    <Box maxWidth="md" mx="auto" py={4}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-        <Typography variant="h4" component="h1">
-          Your Videos
-        </Typography>
+    <Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={6}>
+        <Box>
+          <Typography variant="h3" component="h1" sx={{ fontWeight: 800, mb: 1 }}>
+            Your Studio
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Manage and create your automated short videos
+          </Typography>
+        </Box>
         <Button 
           variant="contained" 
-          color="primary" 
+          size="large"
           startIcon={<AddIcon />}
           onClick={handleCreateNew}
+          sx={{
+            boxShadow: '0 4px 14px 0 rgba(187, 134, 252, 0.39)',
+            py: 1.5,
+            px: 3
+          }}
         >
-          Create New Video
+          New Video
         </Button>
       </Box>
       
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
+        <Alert severity="error" sx={{ mb: 4, borderRadius: 2 }}>{error}</Alert>
       )}
       
       {videos.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography variant="body1" color="text.secondary" gutterBottom>
-            You haven't created any videos yet.
+        <Paper
+          sx={{
+            p: 8,
+            textAlign: 'center',
+            borderRadius: 4,
+            border: '2px dashed rgba(255, 255, 255, 0.1)',
+            bgcolor: 'transparent'
+          }}
+        >
+          <VideoLibraryIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+          <Typography variant="h5" color="text.secondary" gutterBottom sx={{ fontWeight: 600 }}>
+            No videos yet
+          </Typography>
+          <Typography variant="body2" color="text.disabled" sx={{ mb: 4 }}>
+            Start by creating your first automated short video.
           </Typography>
           <Button 
             variant="outlined" 
+            size="large"
             startIcon={<AddIcon />}
             onClick={handleCreateNew}
-            sx={{ mt: 2 }}
           >
             Create Your First Video
           </Button>
         </Paper>
       ) : (
-        <Paper>
-          <List>
-            {videos.map((video, index) => {
-              const videoId = video?.id || '';
-              const videoStatus = video?.status || 'unknown';
-              
-              return (
-                <div key={videoId}>
-                  {index > 0 && <Divider />}
-                  <ListItem 
-                    button 
-                    onClick={() => handleVideoClick(videoId)}
-                    sx={{ 
-                      py: 2,
-                      '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.04)'
+        <Grid container spacing={3}>
+          {videos.map((video) => {
+            const videoId = video?.id || '';
+            const videoStatus = video?.status || 'unknown';
+
+            return (
+              <Grid item xs={12} sm={6} md={4} key={videoId}>
+                <Card
+                  onClick={() => handleVideoClick(videoId)}
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 12px 24px -10px rgba(0,0,0,0.5)',
+                      '& .card-action-overlay': {
+                        opacity: 1
                       }
-                    }}
-                  >
-                    <ListItemText
-                      primary={`Video ${videoId.substring(0, 8)}...`}
-                      secondary={
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          color={
-                            videoStatus === 'ready' ? 'success.main' : 
-                            videoStatus === 'processing' ? 'info.main' : 
-                            videoStatus === 'failed' ? 'error.main' : 'text.secondary'
-                          }
-                        >
-                          {capitalizeFirstLetter(videoStatus)}
-                        </Typography>
-                      }
-                    />
-                    <ListItemSecondaryAction>
+                    },
+                    borderRadius: 4,
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                  }}
+                >
+                  <Box sx={{
+                    height: 160,
+                    bgcolor: 'rgba(255, 255, 255, 0.03)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative'
+                  }}>
+                    <VideoLibraryIcon sx={{ fontSize: 48, color: 'rgba(187, 134, 252, 0.2)' }} />
+                    <Box
+                      className="card-action-overlay"
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        bgcolor: 'rgba(0,0,0,0.4)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: 0,
+                        transition: 'opacity 0.2s'
+                      }}
+                    >
                       {videoStatus === 'ready' && (
-                        <IconButton 
-                          edge="end" 
-                          aria-label="play"
-                          onClick={() => handleVideoClick(videoId)}
-                          color="primary"
-                        >
-                          <PlayArrowIcon />
-                        </IconButton>
+                        <PlayArrowIcon sx={{ fontSize: 48, color: '#fff' }} />
                       )}
+                    </Box>
+                  </Box>
+                  <CardContent sx={{ flexGrow: 1, pt: 2 }}>
+                    <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                        Video {videoId.substring(0, 8)}
+                      </Typography>
+                      <Chip
+                        label={capitalizeFirstLetter(videoStatus)}
+                        size="small"
+                        color={getStatusColor(videoStatus) as any}
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: '0.65rem',
+                          height: 20,
+                          '& .MuiChip-label': { px: 1 }
+                        }}
+                      />
+                    </Box>
+                    <Typography variant="caption" color="text.secondary">
+                      ID: {videoId}
+                    </Typography>
+                  </CardContent>
+                  <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
+                    <Tooltip title="Delete video">
                       <IconButton 
-                        edge="end" 
-                        aria-label="delete" 
+                        size="small"
                         onClick={(e) => handleDeleteVideo(videoId, e)}
-                        color="error"
-                        sx={{ ml: 1 }}
+                        sx={{
+                          color: 'rgba(255, 255, 255, 0.3)',
+                          '&:hover': { color: 'error.main', bgcolor: 'rgba(211, 47, 47, 0.1)' }
+                        }}
                       >
-                        <DeleteIcon />
+                        <DeleteIcon fontSize="small" />
                       </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                </div>
-              );
-            })}
-          </List>
-        </Paper>
+                    </Tooltip>
+                  </CardActions>
+                </Card>
+              </Grid>
+            );
+          })}
+        </Grid>
       )}
     </Box>
   );

@@ -13,7 +13,7 @@ import { logger } from "./logger";
 import { Server } from "./server/server";
 import { MusicManager } from "./short-creator/music";
 
-async function main() {
+export async function main() {
   const config = new Config();
   try {
     config.ensureConfig();
@@ -88,6 +88,8 @@ async function main() {
   // todo add shutdown handler
 }
 
-main().catch((error: unknown) => {
-  logger.error(error, "Error starting server");
-});
+if (require.main === module) {
+  main().catch((error: unknown) => {
+    logger.error(error, "Error starting server");
+  });
+}

@@ -48,9 +48,20 @@ vi.mock("fs-extra", async () => {
       } catch (error) {}
     }),
     createWriteStream: vi.fn(() => ({
-      on: vi.fn(),
+      on: vi.fn((event, cb) => {
+        if (event === "finish") {
+            setTimeout(cb, 10);
+        }
+        return this;
+      }),
       write: vi.fn(),
-      end: vi.fn(),
+      end: vi.fn(function() {
+        if (this.on) {
+            // trigger finish
+        }
+      }),
+      close: vi.fn(),
+      pipe: vi.fn(),
     })),
     readFileSync: vi.fn((path) => {
       return memfs.readFileSync(path);
@@ -59,6 +70,34 @@ vi.mock("fs-extra", async () => {
   return {
     ...fsExtra,
     default: fsExtra,
+  };
+});
+
+// Mock https
+vi.mock("https", () => {
+  const https = {
+    get: vi.fn((url, callback) => {
+      const response = {
+        statusCode: 200,
+        pipe: vi.fn(),
+        on: vi.fn((event, cb) => {
+          if (event === "end") {
+            setTimeout(cb, 10);
+          }
+          if (event === "data") {
+              // noop
+          }
+        }),
+      };
+      callback(response);
+      return {
+        on: vi.fn(),
+      };
+    }),
+  };
+  return {
+    ...https,
+    default: https,
   };
 });
 
@@ -90,13 +129,27 @@ vi.mock("kokoro-js", () => {
   return {
     KokoroTTS: {
       from_pretrained: vi.fn().mockResolvedValue({
-        generate: vi.fn().mockResolvedValue({
-          toWav: vi.fn().mockReturnValue(new ArrayBuffer(8)),
-          audio: new ArrayBuffer(8),
-          sampling_rate: 44100,
+        stream: vi.fn().mockImplementation(() => {
+          return (async function* () {
+            yield {
+              audio: {
+                toWav: () => new ArrayBuffer(44),
+                audio: {
+                  length: 1000,
+                },
+                sampling_rate: 1000,
+              },
+            };
+          })();
         }),
       }),
     },
+    TextSplitterStream: vi.fn().mockImplementation(() => {
+      return {
+        push: vi.fn(),
+        close: vi.fn(),
+      };
+    }),
   };
 });
 
@@ -210,7 +263,7 @@ test("test me", async () => {
 
   // resolve the render promise to simulate the video being processed, and check the status again
   resolveRenderPromise();
-  await new Promise((resolve) => setTimeout(resolve, 100)); // let the queue process the video
+  await new Promise((resolve) => setTimeout(resolve, 1000)); // give it more time to process
   videos = shortCreator.listAllVideos();
   expect(videos.find((v) => v.id === videoId)?.status).toBe("ready");
 
